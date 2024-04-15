@@ -8,6 +8,7 @@ function AddWorkoutForm() {
     const [load, setLoad] = useState('');
     const [reps, setReps] = useState('');
     const [error, setError] = useState(null);
+    const [emptyFields, setEmptyFields] = useState([]);
     const { dispatch } = useWorkoutContext();
     const {user} = useAuthContext();
 
@@ -30,9 +31,14 @@ function AddWorkoutForm() {
             setLoad('');
             setReps('');
             setError(null);
+            setEmptyFields([]);
         } catch (error) {
-            console.log('Error adding workout: ', error);
-            setError(error);
+            const errorMessage = error.response.data.error;
+            setError(errorMessage);
+            console.log(errorMessage)
+            const emptyFields = error.response.data.emptyFields || [];
+            console.log(emptyFields)
+            setEmptyFields(emptyFields);
         }
     }
 
@@ -42,22 +48,22 @@ function AddWorkoutForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-lg font-semibold">Title:</label>
-                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg py-2 px-4" />
+                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg py-2 px-4 ${emptyFields.includes('title') ? 'border-red-500' : ''}`} />
                 </div>
                 <div>
                     <label className="block text-lg font-semibold">Load in Kg:</label>
-                    <input type="number" value={load} onChange={(e) => setLoad(e.target.value)} className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg py-2 px-4" />
+                    <input type="number" value={load} onChange={(e) => setLoad(e.target.value)} className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg py-2 px-4 ${emptyFields.includes('load') ? 'border-red-500' : ''}`} />
                 </div>
                 <div>
                     <label className="block text-lg font-semibold">Reps:</label>
-                    <input type="number" value={reps} onChange={(e) => setReps(e.target.value)} className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg py-2 px-4" />
+                    <input type="number" value={reps} onChange={(e) => setReps(e.target.value)} className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg py-2 px-4 ${emptyFields.includes('reps') ? 'border-red-500' : ''}`} />
                 </div>
                 <button type="submit" className="inline-block bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">Add Workout</button>
             </form>
             {/* Error Message */}
             {error && (
                 <div className="text-center text-red-500 mt-2">
-                    {error.message}
+                    {error}
                 </div>
             )}
         </div>
